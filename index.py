@@ -6,6 +6,7 @@ import discord
 import random
 import time
 import spell
+import my_token
 import virtues_flaws
 
 from discord.ext import commands
@@ -159,5 +160,5 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-bot.run('MTMwNjAwMzE0NzkzNTg0MjMwNQ.G0cFdk.WSUPlfk4mePQBI3DFEDeK-hHb4G29bpjlklnMY')
+bot.run(my_token.TOKEN)
 
