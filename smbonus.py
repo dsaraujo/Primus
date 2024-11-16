@@ -55,5 +55,5 @@ def search_sm_bonus(query):
 
   return msg
 
-print(search_sm_name('tree'))
-print(search_sm_bonus('corpus'))
+#print(search_sm_name('tree'))
+#print(search_sm_bonus('corpus'))

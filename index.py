@@ -70,12 +70,12 @@ async def flaw(interaction: discord.Interaction, query:str=''):
 
 @bot.tree.command(name='smname', description='Search for a Shape or Material bonus.')
 @app_commands.describe(query = "The partial or complete name of the Shape or Material.")
-async def smname(interaction: discord.Interaction, query:str=''):
+async def shapematerialname(interaction: discord.Interaction, query:str=''):
     await interaction.response.send_message(smbonus.search_sm_name(query))
 
 @bot.tree.command(name='smbonus', description='Search for a Shape or Material by the bonus it gives.')
 @app_commands.describe(query = "The partial or complete name of the bonus.")
-async def smbonus(interaction: discord.Interaction, query:str=''):
+async def shapematerialbonus(interaction: discord.Interaction, query:str=''):
     await interaction.response.send_message(smbonus.search_sm_bonus(query))
 
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
