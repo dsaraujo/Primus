@@ -9,6 +9,7 @@ import spell
 import my_token
 import virtues_flaws
 import smbonus
+import baselines
 
 from discord.ext import commands
 from discord import app_commands
@@ -37,7 +38,7 @@ async def on_guild_join(guild):
         break
 
 @bot.tree.command(name='size', description='Get the base size of an Individual of a form.')
-@app_commands.describe(form = "The form, like In or Corpus.")
+@app_commands.describe(form = "The form, like Ig or Corpus.")
 async def sz(interaction: discord.Interaction, form:str=''):
     await interaction.response.send_message(spell.get_spell_base_size(form))
 
@@ -77,6 +78,11 @@ async def shapematerialname(interaction: discord.Interaction, query:str=''):
 @app_commands.describe(query = "The partial or complete name of the bonus.")
 async def shapematerialbonus(interaction: discord.Interaction, query:str=''):
     await interaction.response.send_message(smbonus.search_sm_bonus(query))
+
+@bot.tree.command(name='baselines', description='Get the spell guidelines for an specific technique and form.')
+@app_commands.describe(tech = "The technique, like In or Rego.", form = "The form, like An or Corpus.", level="The maximum level (optional)")
+async def base(interaction: discord.Interaction, tech:str='', form:str='', level:int=1000):
+    await interaction.response.send_message(baselines.get_baseline(tech, form, level))
 
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
 @app_commands.describe(modifier = "The static value to modify the roll")
