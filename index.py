@@ -8,6 +8,7 @@ import time
 import spell
 import my_token
 import virtues_flaws
+import smbonus
 
 from discord.ext import commands
 from discord import app_commands
@@ -66,6 +67,16 @@ async def virtue(interaction: discord.Interaction, query:str=''):
 @app_commands.describe(query = "The partial or complete name of the flaw")
 async def flaw(interaction: discord.Interaction, query:str=''):
     await interaction.response.send_message(virtues_flaws.search_flaw(query))
+
+@bot.tree.command(name='smname', description='Search for a Shape or Material bonus.')
+@app_commands.describe(query = "The partial or complete name of the Shape or Material.")
+async def smname(interaction: discord.Interaction, query:str=''):
+    await interaction.response.send_message(smbonus.search_sm_name(query))
+
+@bot.tree.command(name='smbonus', description='Search for a Shape or Material by the bonus it gives.')
+@app_commands.describe(query = "The partial or complete name of the bonus.")
+async def smbonus(interaction: discord.Interaction, query:str=''):
+    await interaction.response.send_message(smbonus.search_sm_bonus(query))
 
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
 @app_commands.describe(modifier = "The static value to modify the roll")
