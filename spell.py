@@ -776,6 +776,43 @@ targets = {
     "other": "Other",
 }
 
+# <:emoji_name:emoji_id>
+def get_emoji(tech, form):
+  msg = ''  
+  match tech:
+    case 'cr':
+      msg = msg + '<:cr:1307505148729233508>'
+    case 'in':
+      msg = msg + '<:in:1307505212755546205>'
+    case 're':
+      msg = msg + '<:re:1307505352224411700>'
+    case 'mu':
+      msg = msg + '<:mu:1307505317273407560>'
+    case 'pe':
+      msg = msg + '<:pe:1307505333010169977>'
+  match form:
+    case 'au':
+      msg = msg + '<:au:1307505116378566808>'
+    case 'an':
+      msg = msg + '<:an:1307505052075950140>'
+    case 'aq':
+      msg = msg + '<:aq:1307505098313826395>'
+    case 'co':
+      msg = msg + '<:co:1307505132367384728>'
+    case 'he':
+      msg = msg + '<:he:1307505165217169498>'
+    case 'ig':
+      msg = msg + '<:ig:1307505181704982590>'
+    case 'im':
+      msg = msg + '<:im:1307505197299400845>'
+    case 'me':
+      msg = msg + '<:me:1307505238760230932>'
+    case 'te':
+      msg = msg + '<:te:1307505366388441168>'
+    case 'vi':
+      msg = msg + '<:vi:1307505387045523497>'
+  return msg
+
 def getValue(spell_data, label):
     return spell_data[label]["impact"]
 
@@ -808,12 +845,14 @@ def search_spell(query):
     spell_source = spell['system']['source']
     spell_source_page = spell['system']['page']
 
+    emojis = get_emoji(spell['system']['technique']['value'], spell['system']['form']['value'])
+
     technique = spell['system']['technique']['value'].capitalize()
     form = spell['system']['form']['value'].capitalize()
 
     level = calculate_level(spell_base, spell_range, spell_duration, spell_target, spell_size, spell_complexity)
 
-    spell_level = technique + form + " " + str(level)
+    spell_level = emojis + " " + technique + form + " " + str(level)
 
     text_maker = html2text.HTML2Text()
     text_maker.body_width = 0

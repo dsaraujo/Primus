@@ -176,6 +176,7 @@ async def on_ready():
         print(f'Synced {len(synced)} command(s)')
     except Exception as e:
         print(e)
+    await bot.change_presence(activity=discord.CustomActivity(name='Distilling Vis'))
 
 bot.run(my_token.TOKEN)
 
