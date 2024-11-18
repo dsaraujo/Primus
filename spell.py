@@ -777,40 +777,74 @@ targets = {
 }
 
 # <:emoji_name:emoji_id>
-def get_emoji(tech, form):
+def get_emoji(tech, form, iswhite=True):
   msg = ''  
-  match tech:
-    case 'cr':
-      msg = msg + '<:cr:1307505148729233508>'
-    case 'in':
-      msg = msg + '<:in:1307505212755546205>'
-    case 're':
-      msg = msg + '<:re:1307505352224411700>'
-    case 'mu':
-      msg = msg + '<:mu:1307505317273407560>'
-    case 'pe':
-      msg = msg + '<:pe:1307505333010169977>'
-  match form:
-    case 'au':
-      msg = msg + '<:au:1307505116378566808>'
-    case 'an':
-      msg = msg + '<:an:1307505052075950140>'
-    case 'aq':
-      msg = msg + '<:aq:1307505098313826395>'
-    case 'co':
-      msg = msg + '<:co:1307505132367384728>'
-    case 'he':
-      msg = msg + '<:he:1307505165217169498>'
-    case 'ig':
-      msg = msg + '<:ig:1307505181704982590>'
-    case 'im':
-      msg = msg + '<:im:1307505197299400845>'
-    case 'me':
-      msg = msg + '<:me:1307505238760230932>'
-    case 'te':
-      msg = msg + '<:te:1307505366388441168>'
-    case 'vi':
-      msg = msg + '<:vi:1307505387045523497>'
+  if iswhite:
+    match tech:
+      case 'cr':
+        msg = msg + '<:crw:1307920982282862632>'
+      case 'in':
+        msg = msg + '<:inw:1307921033826799646>'
+      case 're':
+        msg = msg + '<:rew:1307921090928181268>'
+      case 'mu':
+        msg = msg + '<:muw:1307921061328715836>'
+      case 'pe':
+        msg = msg + '<:pew:1307921072943005696>'
+    match form:
+      case 'au':
+        msg = msg + '<:auw:1307920948359331922>'
+      case 'an':
+        msg = msg + '<:anw:1307920923839434762>'
+      case 'aq':
+        msg = msg + '<:aqw:1307920936841904200>'
+      case 'co':
+        msg = msg + '<:cow:1307920968941043752>'
+      case 'he':
+        msg = msg + '<:hew:1307920995595583548>'
+      case 'ig':
+        msg = msg + '<:igw:1307921009004908565>'
+      case 'im':
+        msg = msg + '<:imw:1307921022472683553>'
+      case 'me':
+        msg = msg + '<:mew:1307921048372514838>'
+      case 'te':
+        msg = msg + '<:tew:1307921104932831262>'
+      case 'vi':
+        msg = msg + '<:viw:1307921118975234180>'
+  else:
+    match tech:
+      case 'cr':
+        msg = msg + '<:cr:1307505148729233508>'
+      case 'in':
+        msg = msg + '<:in:1307505212755546205>'
+      case 're':
+        msg = msg + '<:re:1307505352224411700>'
+      case 'mu':
+        msg = msg + '<:mu:1307505317273407560>'
+      case 'pe':
+        msg = msg + '<:pe:1307505333010169977>'
+    match form:
+      case 'au':
+        msg = msg + '<:au:1307505116378566808>'
+      case 'an':
+        msg = msg + '<:an:1307505052075950140>'
+      case 'aq':
+        msg = msg + '<:aq:1307505098313826395>'
+      case 'co':
+        msg = msg + '<:co:1307505132367384728>'
+      case 'he':
+        msg = msg + '<:he:1307505165217169498>'
+      case 'ig':
+        msg = msg + '<:ig:1307505181704982590>'
+      case 'im':
+        msg = msg + '<:im:1307505197299400845>'
+      case 'me':
+        msg = msg + '<:me:1307505238760230932>'
+      case 'te':
+        msg = msg + '<:te:1307505366388441168>'
+      case 'vi':
+        msg = msg + '<:vi:1307505387045523497>'
   return msg
 
 def getValue(spell_data, label):
