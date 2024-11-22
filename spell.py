@@ -892,8 +892,8 @@ def search_spell(query):
     text_maker.body_width = 0
     description = text_maker.handle(description).strip()
 
-    if len(description) > 1500:
-        description = description[:1500] + " (...)"
+    #if len(description) > 1500:
+    #    description = description[:1500] + " (...)"
 
     msg = ''
     msg = msg + "**" + name + "** (" + spell_level +")\n"

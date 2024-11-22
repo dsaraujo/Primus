@@ -30,6 +30,39 @@ def is_basic_math_expression(string):
     pattern = r'^[-+]?(\d+(\.\d*)?|\.\d+)([+-/*]\d+(\.\d*)?)*$'
     return bool(re.match(pattern, string))
 
+def split_string_by_n(text, n):
+  """Splits a string into n parts, prioritizing spaces as breaking points.
+
+  Args:
+    text: The input string.
+    n: The number of parts to split the string into.
+
+  Returns:
+    A list of n parts.
+  """
+
+  words = text.split(" ")
+  part_size = len(words) // n
+  parts = []
+
+  start_index = 0
+  for i in range(1, n+1):
+    end_index = start_index + part_size
+    part = ' '.join(words[start_index:end_index])
+    parts.append(part)
+    start_index = end_index
+
+  # Handle the last part, which might have fewer words
+  if len(words) % n != 0:
+    last_part = ' '.join(words[start_index:])
+    parts.append(last_part)
+
+  return parts
+
+def break_string(text):
+    return split_string_by_n(text, round(len(text) / 1950)+1)
+    
+
 @bot.event
 async def on_guild_join(guild):
     for channel in guild.text_channels:
@@ -54,20 +87,37 @@ async def ran(interaction: discord.Interaction):
 async def tar(interaction: discord.Interaction):
     await interaction.response.send_message(spell.get_targets())
 
+@bot.command(name='spell', help="!spell <quoted spell name>")
+async def spellquery2(ctx, *, query:str=''):    
+    for s in break_string(spell.search_spell(query)):
+        await ctx.send(s)        
+
 @bot.tree.command(name='spell', description='Search for a spell.')
 @app_commands.describe(query = "The partial or complete name of the spell")
-async def spellquery(interaction: discord.Interaction, query:str=''):
-    await interaction.response.send_message(spell.search_spell(query))
+async def spellquery(interaction: discord.Interaction, query:str=''):    
+    for index, s in enumerate(break_string(spell.search_spell(query))):
+        if index == 0:
+            await interaction.response.send_message(s)
+        else:
+            await interaction.followup.send(s)
 
 @bot.tree.command(name='virtue', description='Search for a virtue.')
 @app_commands.describe(query = "The partial or complete name of the virtue")
 async def virtue(interaction: discord.Interaction, query:str=''):
-    await interaction.response.send_message(virtues_flaws.search_virtue(query))
+    for index, s in enumerate(break_string(virtues_flaws.search_virtue(query))):
+        if index == 0:
+            await interaction.response.send_message(s)
+        else:
+            await interaction.followup.send(s)    
 
 @bot.tree.command(name='flaw', description='Search for a flaw.')
 @app_commands.describe(query = "The partial or complete name of the flaw")
-async def flaw(interaction: discord.Interaction, query:str=''):
-    await interaction.response.send_message(virtues_flaws.search_flaw(query))
+async def flaw(interaction: discord.Interaction, query:str=''):    
+    for index, s in enumerate(break_string(virtues_flaws.search_flaw(query))):
+        if index == 0:
+            await interaction.response.send_message(s)
+        else:
+            await interaction.followup.send(s)
 
 @bot.tree.command(name='smname', description='Search for a Shape or Material bonus.')
 @app_commands.describe(query = "The partial or complete name of the Shape or Material.")
@@ -82,7 +132,11 @@ async def shapematerialbonus(interaction: discord.Interaction, query:str=''):
 @bot.tree.command(name='baselines', description='Get the spell guidelines for an specific technique and form.')
 @app_commands.describe(tech = "The technique, like In or Rego.", form = "The form, like An or Corpus.", level="The maximum level (optional)")
 async def base(interaction: discord.Interaction, tech:str='', form:str='', level:int=1000):
-    await interaction.response.send_message(baselines.get_baseline(tech, form, level))
+    for index, s in enumerate(break_string(baselines.get_baseline(tech, form, level))):
+        if index == 0:
+            await interaction.response.send_message(s)
+        else:
+            await interaction.followup.send(s)
 
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
 @app_commands.describe(modifier = "The static value to modify the roll")
@@ -94,8 +148,8 @@ async def simple(interaction: discord.Interaction, modifier:int=0):
         response = username + " rolls a simple die\n"
         response = response + "Result: " + str(roll)
     else:
-        response = username + " rolls " + str(modifier) + " plus a simple die\n"
-        response = response + "Result: " + str(modifier) + " + " + str(roll) + " = " + str(modifier+roll)
+        response = username + " rolls a simple die plus " + str(modifier) + "\n"
+        response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll)
     await interaction.response.send_message(response)
 
 @bot.tree.command(name="stress", description='Rolls a stress dice with a modifier and botch dices to roll if you roll a zero.')
@@ -105,7 +159,7 @@ async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1
     if modifier == 0:
         response = str(interaction.user.display_name) + " rolls a stress die"
     else:
-        response = str(interaction.user.display_name) + " rolls " + str(modifier) + " plus a stress die"
+        response = str(interaction.user.display_name) + " rolls a stress die plus " + str(modifier) 
 
     if botch == 0:
         response = response + " (no botch):\n"
@@ -138,7 +192,7 @@ async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1
                     botches = botches + 1
             response = response + "\n"
             if botches == 0:
-                response = response + "Result: " + str(modifier) + " + 0 = " + str(modifier) + " (no botches - whew!)"
+                response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (no botches!)"
             elif botches == 1:
                 response = response + "Result: 0 (1 botch!)"
             else:
@@ -159,7 +213,7 @@ async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1
         if modifier == 0:
             response = response + "Result: " + str(roll * multiplier)
         else:
-            response = response + "Result: " + str(modifier) + " + " + str(roll * multiplier) + " = " + str((roll*multiplier + modifier))
+            response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier))
 
     await interaction.response.send_message(response)
 
