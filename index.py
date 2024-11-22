@@ -10,6 +10,7 @@ import my_token
 import virtues_flaws
 import smbonus
 import baselines
+import dice
 
 from discord.ext import commands
 from discord import app_commands
@@ -129,7 +130,7 @@ async def shapematerialname(interaction: discord.Interaction, query:str=''):
 async def shapematerialbonus(interaction: discord.Interaction, query:str=''):
     await interaction.response.send_message(smbonus.search_sm_bonus(query))
 
-@bot.tree.command(name='baselines', description='Get the spell guidelines for an specific technique and form.')
+@bot.tree.command(name='guidelines', description='Get the spell guidelines for an specific technique and form.')
 @app_commands.describe(tech = "The technique, like In or Rego.", form = "The form, like An or Corpus.", level="The maximum level (optional)")
 async def base(interaction: discord.Interaction, tech:str='', form:str='', level:int=1000):
     for index, s in enumerate(break_string(baselines.get_baseline(tech, form, level))):
@@ -138,84 +139,36 @@ async def base(interaction: discord.Interaction, tech:str='', form:str='', level
         else:
             await interaction.followup.send(s)
 
+@bot.command(name='guidelines', help="!guidelines <technique> <form> <level> - Check the guidelines for the Tech+Form up to level")
+async def guide(ctx, tech:str, form:str, level:int=1000):
+    for s in break_string(baselines.get_baseline(tech, form, level)):
+        await ctx.send(s)
+
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
 @app_commands.describe(modifier = "The static value to modify the roll")
 async def simple(interaction: discord.Interaction, modifier:int=0):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")
-    roll = random.randint(1, 10)
-    if modifier == 0:
-        response = username + " rolls a simple die\n"
-        response = response + "Result: " + str(roll)
-    else:
-        response = username + " rolls a simple die plus " + str(modifier) + "\n"
-        response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll)
-    await interaction.response.send_message(response)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    await interaction.response.send_message(dice.simple(username, modifier))
 
 @bot.tree.command(name="stress", description='Rolls a stress dice with a modifier and botch dices to roll if you roll a zero.')
 @app_commands.describe(modifier = "The static value to modify the roll", botch="Numer of botch dices if you roll a zero")
 async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1):
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " someone rolled a stress die")
-    if modifier == 0:
-        response = str(interaction.user.display_name) + " rolls a stress die"
-    else:
-        response = str(interaction.user.display_name) + " rolls a stress die plus " + str(modifier) 
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " someone rolled a stress die")    
+    await interaction.response.send_message(dice.stress(username, modifier, botch))
 
-    if botch == 0:
-        response = response + " (no botch):\n"
-    elif botch == 1:
-        response = response + " (1 botch die):\n"
-    else:
-        response = response + " (" + str(botch) + " botch dice):\n"
+@bot.command(name='simple', help="!simple <modifier> - Rolls a simple die and add the modifier")
+async def simple2(ctx, modifier:int=0):
+    username = str(ctx.author.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    await ctx.send(dice.simple(username, modifier))
 
-    #Limit botch dice so someone doesn't crash the server with 999,999,999,999...
-    if botch > 25:
-        botch = 25
-        response = response + "Botch dice capped at 25 to prevent server abuse.\n"
-
-    multiplier = 1
-    roll = random.randint(0, 9)
-    
-    if roll == 0:
-        if botch == 0:
-            # no botch dice, so it's just a zero
-            response = response + "Result: " + str(modifier)
-        elif botch > 0:
-            response = response + "Rolled a 0, Checking for Botch: "
-            botches = 0
-            for b in range (1,botch+1):
-                botchdie = random.randint(0,9)
-                response = response + str(botchdie)
-                if b < botch:
-                    response = response + ", "
-                if botchdie == 0:
-                    botches = botches + 1
-            response = response + "\n"
-            if botches == 0:
-                response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (no botches!)"
-            elif botches == 1:
-                response = response + "Result: 0 (1 botch!)"
-            else:
-                response = response + "Result: 0 (" + str(botches) + " botches!)"
-    else:
-        # a 0 was not rolled, so process the stress roll normally
-        while roll == 1:
-            if multiplier == 1:
-                response = response + "Roll: "
-            multiplier = multiplier * 2
-            response = response + '1, '
-            roll = random.randint(1,10)
-        
-        if multiplier > 1:
-            response = response + str(roll)
-            response = response + " (x" + str(multiplier) + ") = " + str(roll*multiplier) + "\n"
-        
-        if modifier == 0:
-            response = response + "Result: " + str(roll * multiplier)
-        else:
-            response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier))
-
-    await interaction.response.send_message(response)
+@bot.command(name='stress', help="!stress <modifier> <botch> - Rolls a stress die, add the mod. Default botches is 1.")
+async def simple2(ctx, modifier:int=0, botches:int=0):
+    username = str(ctx.author.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    await ctx.send(dice.stress(username, modifier, botches))
 
 @bot.event
 async def on_command_error(ctx, error):
