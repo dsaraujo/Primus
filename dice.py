@@ -3,21 +3,21 @@ import random
 
 def ease_factor(total:int): 
     msg = ""
-    if (total <= 0):
+    if (total < 3):
         return "Trivial"
-    elif (total <=3):
+    elif (total < 6):
         return "Simple"
-    elif (total <=6):
+    elif (total < 9):
         return "Easy"
-    elif (total <=9):
+    elif (total < 12):
         return "Average"
-    elif (total <=12):
+    elif (total < 15):
         return "Hard"
-    elif (total <=15):
+    elif (total < 18):
         return "Very Hard"
-    elif (total <=18):
+    elif (total < 21):
         return "Impressive"
-    elif (total <=18):
+    elif (total < 24):
         return "Remarkable"
     else:
         return "Almost Impossible"
