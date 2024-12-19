@@ -90,6 +90,6 @@ def stress(username, modifier:int, botch:int):
       if modifier == 0:
           response = response + "Result: " + str(roll * multiplier) + " (" + ease_factor(modifier+roll) + ")"
       else:
-          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + "(" + ease_factor(roll*multiplier + modifier) + ")"
+          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " (" + ease_factor(roll*multiplier + modifier) + ")"
 
   return response
