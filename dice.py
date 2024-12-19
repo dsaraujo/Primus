@@ -1,14 +1,35 @@
 
 import random
 
+def ease_factor(total:int): 
+    msg = ""
+    if (total <= 0):
+        return "Trivial"
+    elif (total <=3):
+        return "Simple"
+    elif (total <=6):
+        return "Easy"
+    elif (total <=9):
+        return "Average"
+    elif (total <=12):
+        return "Hard"
+    elif (total <=15):
+        return "Very Hard"
+    elif (total <=18):
+        return "Impressive"
+    elif (total <=18):
+        return "Remarkable"
+    else:
+        return "Almost Impossible"
+
 def simple(username, modifier:int):  
   roll = random.randint(1, 10)
   if modifier == 0:
       response = username + " rolls a simple die\n"
-      response = response + "Result: " + str(roll)
+      response = response + "Result: " + str(roll) + " (" + ease_factor(roll) + ")"
   else:
       response = username + " rolls a simple die plus " + str(modifier) + "\n"
-      response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll)
+      response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll) + " (" + ease_factor(modifier+roll) + ")"
   return response
 
 def stress(username, modifier:int, botch:int):  
@@ -35,7 +56,7 @@ def stress(username, modifier:int, botch:int):
   if roll == 0:
       if botch == 0:
           # no botch dice, so it's just a zero
-          response = response + "Result: " + str(modifier)
+          response = response + "Result: " + str(modifier) + " (" + ease_factor(modifier+roll) + ")"
       elif botch > 0:
           response = response + "Rolled a 0, Checking for Botch: "
           botches = 0
@@ -48,11 +69,11 @@ def stress(username, modifier:int, botch:int):
                   botches = botches + 1
           response = response + "\n"
           if botches == 0:
-              response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (no botches!)"
+              response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ease_factor(modifier+roll) + ", no botches!)"
           elif botches == 1:
-              response = response + "Result: 0 (1 botch!)"
+              response = response + "Result: 0 (" + " (" + ease_factor(modifier+roll) + ", 1 botch!)"
           else:
-              response = response + "Result: 0 (" + str(botches) + " botches!)"
+              response = response + "Result: 0 " + " (" + ease_factor(modifier+roll) + ", " + str(botches) + " botches!)"
   else:
       # a 0 was not rolled, so process the stress roll normally
       while roll == 1:
@@ -67,8 +88,8 @@ def stress(username, modifier:int, botch:int):
           response = response + " (x" + str(multiplier) + ") = " + str(roll*multiplier) + "\n"
       
       if modifier == 0:
-          response = response + "Result: " + str(roll * multiplier)
+          response = response + "Result: " + str(roll * multiplier) + "(" + ease_factor(modifier+roll) + ")"
       else:
-          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier))
+          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + "(" + ease_factor(roll*multiplier + modifier) + ")"
 
   return response
