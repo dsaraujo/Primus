@@ -22,7 +22,7 @@ def ease_factor(total:int):
     else:
         return "Almost Impossible"
 
-def simple(username, modifier:int):  
+def simple(username, modifier:int, reason:str):  
   roll = random.randint(1, 10)
   if modifier == 0:
       response = username + " rolls a simple die\n"
@@ -30,9 +30,11 @@ def simple(username, modifier:int):
   else:
       response = username + " rolls a simple die plus " + str(modifier) + "\n"
       response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll) + " (" + ease_factor(modifier+roll) + ")"
+  if reason != '':
+      response = response + " for " + reason
   return response
 
-def stress(username, modifier:int, botch:int):  
+def stress(username, modifier:int, botch:int, reason:str):  
   if modifier == 0:
           response = str(username) + " rolls a stress die"
   else:
@@ -69,11 +71,11 @@ def stress(username, modifier:int, botch:int):
                   botches = botches + 1
           response = response + "\n"
           if botches == 0:
-              response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ease_factor(modifier+roll) + ", no botches!)"
+              response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ease_factor(modifier) + ", no botches!)"
           elif botches == 1:
-              response = response + "Result: 0 (" + " (" + ease_factor(modifier+roll) + ", 1 botch!)"
+              response = response + "Result: 0 (" + " (Failure, 1 botch!)"
           else:
-              response = response + "Result: 0 " + " (" + ease_factor(modifier+roll) + ", " + str(botches) + " botches!)"
+              response = response + "Result: 0 " + " (Failure, " + str(botches) + " botches!)"
   else:
       # a 0 was not rolled, so process the stress roll normally
       while roll == 1:
@@ -92,4 +94,7 @@ def stress(username, modifier:int, botch:int):
       else:
           response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " (" + ease_factor(roll*multiplier + modifier) + ")"
 
+  if reason != '':
+        response = response + " for " + reason
+  
   return response
