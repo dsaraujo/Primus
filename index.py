@@ -155,7 +155,7 @@ async def simple(interaction: discord.Interaction, modifier:int=0, reason:str=''
 @app_commands.describe(modifier = "The static value to modify the roll", botch="Numer of botch dices if you roll a zero", reason = "The reason for the roll")
 async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " someone rolled a stress die")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a stress die")    
     await interaction.response.send_message(dice.stress(username, modifier, botch, reason))
 
 @bot.command(name='simple', help="!simple <modifier> <reason> - Rolls a simple die and add the modifier with an optional reason for the roll")
@@ -165,7 +165,7 @@ async def simple2(ctx, modifier:int=0, reason:str=''):
     await ctx.send(dice.simple(username, modifier, reason))
 
 @bot.command(name='stress', help="!stress <modifier> <botch> - Rolls a stress die, add the mod. Default botches is 1. Optional reason for the roll")
-async def simple2(ctx, modifier:int=0, botches:int=0, reason:str=''):
+async def stress2(ctx, modifier:int=0, botches:int=0, reason:str=''):
     username = str(ctx.author.display_name)
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
     await ctx.send(dice.stress(username, modifier, botches, reason))
