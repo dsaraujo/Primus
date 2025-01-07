@@ -22,14 +22,35 @@ def ease_factor(total:int):
     else:
         return "Almost Impossible"
 
-def simple(username, modifier:int, reason:str):  
+def simple(username, modifier:int, rolltype:str, ease:int, reason:str):  
   roll = random.randint(1, 10)
   if modifier == 0:
-      response = username + " rolls a simple die\n"
-      response = response + "Result: " + str(roll) + " (" + ease_factor(roll) + ")"
+      response = username + " rolls a simple die"
+      if rolltype == 'skill' and ease > 0:
+          response = response + " vs ease factor of " + str(ease)
+      response = response + '\n'
+      response = response + "Result: " + str(roll) 
   else:
-      response = username + " rolls a simple die plus " + str(modifier) + "\n"
-      response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll) + " (" + ease_factor(modifier+roll) + ")"
+      response = username + " rolls a simple die plus " + str(modifier)
+      if rolltype == 'skill' and ease > 0:
+          response = response + " vs ease factor of " + str(ease)
+      response = response + '\n'
+      response = response + "Result: " + str(roll) + " + " + str(modifier) + " = " + str(modifier+roll) 
+  if rolltype == '':
+      response = response + " (" + ease_factor(modifier+roll) + ")"
+  elif rolltype == 'skill':
+      if ease == 0:
+        response = response + " (" + ease_factor(modifier+roll) + ")"
+      else:
+        response = response + " (" + ('Success' if (modifier+roll)>ease else 'Failure') + ")"
+  elif rolltype == 'spell':
+      if ease != 0:
+        if (modifier+roll) >= ease:
+          response = response + " (Success with " + str((modifier+roll)-ease) + " plus penetration Score for Total Penetration)"
+        else:
+          response = response + " (Failure by " + str(ease-(modifier+roll)) + ")"
+      else:
+        response = response + " (" + ease_factor(modifier+roll) + ")"
   if reason != '':
       response = response + " for " + reason
   return response
