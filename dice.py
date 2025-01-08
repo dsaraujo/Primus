@@ -42,31 +42,42 @@ def simple(username, modifier:int, rolltype:str, ease:int, reason:str):
       if ease == 0:
         response = response + " (" + ease_factor(modifier+roll) + ")"
       else:
-        response = response + " (" + ('Success' if (modifier+roll)>ease else 'Failure') + ")"
+        response = response + " (" + ('Success' if (modifier+roll) >= ease else 'Failure') + ")"
   elif rolltype == 'spell':
-      if ease != 0:
-        if (modifier+roll) >= ease:
-          response = response + " (Success with " + str((modifier+roll)-ease) + " plus penetration Score for Total Penetration)"
-        else:
-          response = response + " (Failure by " + str(ease-(modifier+roll)) + ")"
-      else:
-        response = response + " (" + ease_factor(modifier+roll) + ")"
+      response = response + get_spell_result(roll, modifier, ease)
   if reason != '':
       response = response + " for " + reason
   return response
 
-def stress(username, modifier:int, botch:int, reason:str):  
+def get_spell_result(roll, modifier, ease):
+    response = ''
+    if ease != 0:
+        if (modifier+roll) >= ease:
+          response = response + " (Success, Total Penetration = " + str((modifier+roll)-ease) + " plus penetration score)"
+        else:
+          response = response + " (Failure by " + str(ease-(modifier+roll)) + ")"
+    else:
+        response = response + " (" + ease_factor(modifier+roll) + ")"
+    return response
+
+def stress(username, modifier:int, botch:int, rolltype:str, ease:int, reason:str):  
   if modifier == 0:
           response = str(username) + " rolls a stress die"
   else:
-      response = str(username) + " rolls a stress die plus " + str(modifier) 
+      response = str(username) + " rolls a stress die plus " + str(modifier)   
 
   if botch == 0:
-      response = response + " (no botch):\n"
+      response = response + " (no botch)"
   elif botch == 1:
-      response = response + " (1 botch die):\n"
+      response = response + " (1 botch die)"
   else:
-      response = response + " (" + str(botch) + " botch dice):\n"
+      response = response + " (" + str(botch) + " botch dice)"
+        
+  if rolltype == 'skill' and ease > 0:
+          response = response + " vs ease factor of " + str(ease)
+  elif rolltype == 'spell' and ease > 0:
+          response = response + " vs spell target of " + str(ease)
+  response = response + ':\n'
 
   #Limit botch dice so someone doesn't crash the server with 999,999,999,999...
   if botch > 25:
@@ -79,7 +90,13 @@ def stress(username, modifier:int, botch:int, reason:str):
   if roll == 0:
       if botch == 0:
           # no botch dice, so it's just a zero
-          response = response + "Result: " + str(modifier) + " (" + ease_factor(modifier+roll) + ")"
+          if rolltype == '':
+            response = response + "Result: " + str(modifier) + " (" + ease_factor(modifier) + ")"
+          elif rolltype == 'skill' and ease > 0:
+            response = response + "Result: " + str(modifier) + " (" + ('Success' if modifier >= ease else 'Failure') + ")"
+          elif rolltype == 'spell' and ease > 0:
+            response = response + get_spell_result(roll, modifier, ease)
+              
       elif botch > 0:
           response = response + "Rolled a 0, Checking for Botch: "
           botches = 0
@@ -92,11 +109,16 @@ def stress(username, modifier:int, botch:int, reason:str):
                   botches = botches + 1
           response = response + "\n"
           if botches == 0:
-              response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ease_factor(modifier) + ", no botches!)"
+              if rolltype == '':
+                response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ease_factor(modifier) + ", no botches!)"
+              elif rolltype == 'skill' and ease > 0:
+                response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + " (" + ('Success' if modifier >= ease else 'Failure') + ", no botches!)"
+              elif rolltype == 'spell' and ease > 0:
+                response = response + "Result: 0 + " + str(modifier) + " = " + str(modifier) + get_spell_result(roll, modifier, ease) + " (no botches!)"
           elif botches == 1:
-              response = response + "Result: 0 (" + " (Failure, 1 botch!)"
+              response = response + "Result: 0 (**Failure, 1 botch**!)"
           else:
-              response = response + "Result: 0 " + " (Failure, " + str(botches) + " botches!)"
+              response = response + "Result: 0 (**Failure, " + str(botches) + " botches**!)"
   else:
       # a 0 was not rolled, so process the stress roll normally
       while roll == 1:
@@ -110,10 +132,15 @@ def stress(username, modifier:int, botch:int, reason:str):
           response = response + str(roll)
           response = response + " (x" + str(multiplier) + ") = " + str(roll*multiplier) + "\n"
       
-      if modifier == 0:
-          response = response + "Result: " + str(roll * multiplier) + " (" + ease_factor(roll*multiplier) + ")"
-      else:
-          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " (" + ease_factor(roll*multiplier + modifier) + ")"
+      if rolltype == '':
+        if modifier == 0:
+            response = response + "Result: " + str(roll * multiplier) + " (" + ease_factor(roll*multiplier) + ")"
+        else:
+            response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " (" + ease_factor(roll*multiplier + modifier) + ")"
+      elif rolltype == 'skill' and ease > 0:
+          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " (" + ('Success' if (roll*multiplier + modifier) >= ease else 'Failure') + ")"
+      elif rolltype == 'spell' and ease > 0:
+          response = response + "Result: " + str(roll * multiplier) +  " + " + str(modifier) + " = " + str((roll*multiplier + modifier)) + " " + get_spell_result(roll*multiplier, modifier, ease)
 
   if reason != '':
         response = response + " for " + reason
