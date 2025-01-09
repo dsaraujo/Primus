@@ -1,4 +1,5 @@
 import json
+import spell
 
 from thefuzz import fuzz, process
 
@@ -37,7 +38,7 @@ def get_baseline(technique, form, max_level=1000):
 
   results.sort()
 
-  msg = msg + "== **" + technique.capitalize() + form.capitalize() + "** ==\n"
+  msg = msg + "== **" + technique.capitalize() + form.capitalize() + " " + spell.get_emoji(technique, form) +  "** ==\n"
 
   for r in results:
     if r[2] == 0:

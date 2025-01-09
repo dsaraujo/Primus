@@ -157,6 +157,13 @@ async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a stress die")    
     await interaction.response.send_message(dice.stress(username, modifier, botch, rolltype, ease, reason))
 
+@bot.tree.command(name="cast", description='Rolls a stress dice with a modifier and botch dices to roll for an spontaneous cast.')
+@app_commands.describe(modifier = "The static value to modify the roll", botch="Numer of botch dices if you roll a zero", reason = "The reason for the roll", magnitude = "The magnitudes added to the guideline")
+async def cast(interaction: discord.Interaction, modifier: int=0, botch: int=1, magnitude: int=0, reason:str=''):
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell")    
+    await interaction.response.send_message(dice.cast(username, modifier, botch, magnitude, reason))
+
 @bot.command(name='simple', help="!simple <modifier> [rolltype] [easefactor] [reason] - Rolls a simple die and add the modifier with an optional reason for the roll. Rolltype can be skill or spell.")
 async def simple2(ctx, modifier:int=0, rolltype:str='', ease:int=0, reason:str=''):
     username = str(ctx.author.display_name)
@@ -168,6 +175,12 @@ async def stress2(ctx, modifier:int=0, botches:int=0, rolltype:str='', ease:int=
     username = str(ctx.author.display_name)
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
     await ctx.send(dice.stress(username, modifier, botches, rolltype, ease, reason))
+
+@bot.command(name='cast', help="!spell <modifier> [botch=1] [magnitude=0] [reason] - Rolls a stress die, add the mod. Default botches is 1. Optional reason for the roll.")
+async def spell2(interaction: discord.Interaction, modifier: int=0, botch: int=1, magnitude: int=0, reason:str=''):
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell")    
+    await interaction.response.send_message(dice.cast(username, modifier, botch, magnitude, reason))
 
 @bot.event
 async def on_command_error(ctx, error):

@@ -1,5 +1,4 @@
 import json
-import sys
 import html2text
 
 from thefuzz import fuzz, process
