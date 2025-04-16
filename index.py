@@ -176,7 +176,7 @@ async def cast(interaction: discord.Interaction, modifier: int=0, botch: int=1, 
 @app_commands.describe(diceexpression = "The dice expression, like 1d20+6", reason = "The reason for the roll")
 async def roll(interaction: discord.Interaction, diceexpression: str, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression for " + reason)    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression " + diceexpression +  " for " + reason)    
     await interaction.response.send_message(armdice.roll(username, diceexpression, reason))
 
 @bot.command(name='simple', help="!simple <modifier> [rolltype] [easefactor] [reason] - Rolls a simple die and add the modifier with an optional reason for the roll. Rolltype can be skill or spell.")
@@ -200,7 +200,7 @@ async def spell2(ctx, modifier: int=0, botch: int=1, magnitude: int=0, reason:st
 @bot.command(name='roll', help="!roll <diceexpression> [reason] - Rolls a dice expression, like 3d6. Optional reason for the roll.")
 async def roll2(ctx, diceexpression: str, reason:str=''):
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression: " + diceexpression)    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression: " + diceexpression + " for " + reason)    
     await ctx.send(armdice.roll(username, diceexpression, reason))
 
 @bot.event
