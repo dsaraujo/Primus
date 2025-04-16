@@ -1,5 +1,6 @@
 
 import random
+import dice
 import math
 
 def ease_factor(total:int): 
@@ -22,6 +23,17 @@ def ease_factor(total:int):
         return "Remarkable"
     else:
         return "Almost Impossible"
+
+def roll(username, diceexpression:str, reason:str):
+    try:
+        roll = int(dice.roll(diceexpression))
+        result = username + " rolled " + str(diceexpression) + ", total: " + str(roll) 
+        if reason:
+            result = result + " for " + reason
+        return result
+    except dice.DiceBaseException as e:
+        print(e)
+        return "Error: " + str(e)
 
 def simple(username, modifier:int, rolltype:str, ease:int, reason:str):  
   roll = random.randint(1, 10)
