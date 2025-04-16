@@ -26,10 +26,11 @@ def ease_factor(total:int):
 
 def roll(username, diceexpression:str, reason:str):
     try:
-        roll = int(dice.roll(diceexpression))
-        result = username + " rolled " + str(diceexpression) + ", total: " + str(roll) 
+        roll = dice.roll(diceexpression)
+        result = username + " rolled " + str(diceexpression) 
         if reason:
-            result = result + " for " + reason
+            result = result + " for " + reason 
+        result = result + "\nResult: " + str(roll)
         return result
     except dice.DiceBaseException as e:
         print(e)

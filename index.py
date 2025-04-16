@@ -91,6 +91,8 @@ async def tar(interaction: discord.Interaction):
 async def spellquery2(ctx, *, query:str=''):    
     for s in break_string(spell.search_spell(query)):
         await ctx.send(s)        
+    username = str(ctx.author.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searche the spell " + query)
 
 @bot.tree.command(name='spell', description='Search for a spell.')
 @app_commands.describe(query = "The partial or complete name of the spell")
@@ -100,6 +102,8 @@ async def spellquery(interaction: discord.Interaction, query:str=''):
             await interaction.response.send_message(s)
         else:
             await interaction.followup.send(s)
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searche the spell " + query)
 
 @bot.tree.command(name='virtue', description='Search for a virtue.')
 @app_commands.describe(query = "The partial or complete name of the virtue")
@@ -137,62 +141,66 @@ async def base(interaction: discord.Interaction, tech:str='', form:str='', level
             await interaction.response.send_message(s)
         else:
             await interaction.followup.send(s)
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " checked guidelines for " + tech + " " + form + " up to level " + str(level))     
 
 @bot.command(name='guidelines', help="!guidelines <technique> <form> <level> - Check the guidelines for the Tech+Form up to level")
 async def guide(ctx, tech:str, form:str, level:int=1000):
     for s in break_string(baselines.get_baseline(tech, form, level)):
         await ctx.send(s)
+    username = str(ctx.author.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " checked guidelines for " + tech + " " + form + " up to level " + str(level))     
 
 @bot.tree.command(name='simple', description='Rolls a simple dice with a modifier.')
 @app_commands.describe(modifier = "The static value to modify the roll", reason = "The reason for the roll", rolltype = "Type of roll [skill|spell]", ease = "Target Number (Ease Factor)")
 async def simple(interaction: discord.Interaction, modifier:int=0, rolltype:str='', ease:int=0, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die for " + reason)    
     await interaction.response.send_message(armdice.simple(username, modifier, rolltype, ease, reason))
 
 @bot.tree.command(name="stress", description='Rolls a stress dice with a modifier and botch dices to roll if you roll a zero.')
 @app_commands.describe(modifier = "The static value to modify the roll", botch="Numer of botch dices if you roll a zero", reason = "The reason for the roll", rolltype = "Type of roll [skill|spell]", ease = "Target Number (Ease Factor)")
 async def stress(interaction: discord.Interaction, modifier: int=0, botch: int=1, rolltype:str='', ease:int=0, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a stress die")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a stress die for " + reason)    
     await interaction.response.send_message(armdice.stress(username, modifier, botch, rolltype, ease, reason))
 
 @bot.tree.command(name="cast", description='Rolls a stress dice with a modifier and botch dices to roll for an spontaneous cast.')
 @app_commands.describe(modifier = "The static value to modify the roll", botch="Numer of botch dices if you roll a zero", reason = "The reason for the roll", magnitude = "The magnitudes added to the guideline")
 async def cast(interaction: discord.Interaction, modifier: int=0, botch: int=1, magnitude: int=0, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell for " + reason)    
     await interaction.response.send_message(armdice.cast(username, modifier, botch, magnitude, reason))
 
 @bot.tree.command(name="roll", description='Roll traditional dice expressions.')
 @app_commands.describe(diceexpression = "The dice expression, like 1d20+6", reason = "The reason for the roll")
 async def roll(interaction: discord.Interaction, diceexpression: str, reason:str=''):
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression for " + reason)    
     await interaction.response.send_message(armdice.roll(username, diceexpression, reason))
 
 @bot.command(name='simple', help="!simple <modifier> [rolltype] [easefactor] [reason] - Rolls a simple die and add the modifier with an optional reason for the roll. Rolltype can be skill or spell.")
 async def simple2(ctx, modifier:int=0, rolltype:str='', ease:int=0, reason:str=''):
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die for " + reason)    
     await ctx.send(armdice.simple(username, modifier, rolltype, ease, reason))
 
 @bot.command(name='stress', help="!stress <modifier> [botch=1] [rolltype=skill|spell] [easefactor] [reason] - Rolls a stress die, add the mod. Default botches is 1. Optional reason for the roll. Rolltype can be skill or spell.")
 async def stress2(ctx, modifier:int=0, botches:int=0, rolltype:str='', ease:int=0, reason:str=''):
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a simple die for " + reason)    
     await ctx.send(armdice.stress(username, modifier, botches, rolltype, ease, reason))
 
 @bot.command(name='cast', help="!spell <modifier> [botch=1] [magnitude=0] [reason] - Rolls a stress die, add the mod. Default botches is 1. Optional reason for the roll.")
 async def spell2(ctx, modifier: int=0, botch: int=1, magnitude: int=0, reason:str=''):
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a spell for " + reason)
     await ctx.send(armdice.cast(username, modifier, botch, magnitude, reason))
 
 @bot.command(name='roll', help="!roll <diceexpression> [reason] - Rolls a dice expression, like 3d6. Optional reason for the roll.")
 async def roll2(ctx, diceexpression: str, reason:str=''):
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression")    
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression: " + diceexpression)    
     await ctx.send(armdice.roll(username, diceexpression, reason))
 
 @bot.event
