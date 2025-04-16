@@ -14,5 +14,6 @@ Rolling one stress dice with one botch:
 
 /stress 
 
-
+You can roll dice expressions with /roll, like 3d6. 
+Check https://github.com/borntyping/python-dice for usage.
 
