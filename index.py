@@ -179,6 +179,13 @@ async def roll(interaction: discord.Interaction, diceexpression: str, reason:str
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression " + diceexpression +  " for " + reason)    
     await interaction.response.send_message(armdice.roll(username, diceexpression, reason))
 
+@bot.tree.command(name="age", description='Roll Aging.')
+@app_commands.describe(age = "The current age of a character, like 43", modifier = "The modifiers to the aging roll, like a longevity ritual or living conditions.")
+async def roll(interaction: discord.Interaction, age: int, modifier:int=0):
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled aging " + str(age))    
+    await interaction.response.send_message(armdice.aging(username, age, modifier))
+
 @bot.command(name='simple', help="!simple <modifier> [rolltype] [easefactor] [reason] - Rolls a simple die and add the modifier with an optional reason for the roll. Rolltype can be skill or spell.")
 async def simple2(ctx, modifier:int=0, rolltype:str='', ease:int=0, reason:str=''):
     username = str(ctx.author.display_name)
