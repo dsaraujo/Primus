@@ -163,6 +163,102 @@ def cast(username, modifier:int, botch:int, magnitude:int, reason:str):
 
     return response
 
+def stress_die_no_botch() -> int:
+    """
+    Rolls a stress die that cannot botch, as required for aging.
+    - 1s double the next roll.
+    - 0s on the die (represented by 10 here) are a result of 0.
+    """
+    roll = random.randint(1, 10)
+    if roll == 1:
+        multiplier = 2
+        while True:
+            reroll = random.randint(1, 10)
+            if reroll == 1:
+                # Cap multiplier to prevent theoretical infinite loops
+                if multiplier >= 1024:
+                    return 10 * multiplier 
+                multiplier *= 2
+            else:
+                # On a re-roll, a '0' on the die counts as 10
+                value = 10 if reroll == 10 else reroll
+                return value * multiplier
+    elif roll == 10:  # Represents a '0' on the die
+        return 0
+    else:
+        return roll
+
+def aging(username, age:int, modidifier:int) -> str:
+    """
+    Performs an Ars Magica 5th Edition aging roll and returns a formatted string.
+
+    Args:
+        age: The character's age in years.
+        modifier: The character's total aging roll modifier (from Longevity Ritual,
+                  Living Conditions, etc.).
+    
+    Returns:
+        A string describing the roll and its outcome.
+    """
+    if age < 35:
+        return f"At age {age}, no aging roll is required."
+
+    # Perform the no-botch stress die roll.
+    # Replace stress_die_no_botch() with your own bot's function if you have one.
+    d10_result = stress_die_no_botch()
+
+    # Calculate the components of the aging roll.
+    age_bonus = math.ceil(age / 10)
+    aging_total = d10_result + age_bonus - modifier
+
+    # Start building the output string for Discord.
+    output_lines = []
+    output_lines.append(f"**Aging Roll for Age {age}** (Modifier: `{modifier}`)")
+    output_lines.append(f"`Stress Die: {d10_result} + Age Bonus: {age_bonus} - Modifier: {modifier} =` **Total: {aging_total}**")
+    output_lines.append("---") # Creates a horizontal line in Discord
+
+    # Determine the outcomes based on the Aging Rolls table (ArM5, p. 170).
+    result_descriptions = []
+    
+    # First, determine the effect on apparent age.
+    if aging_total <= 2:
+        result_descriptions.append("No apparent aging.")
+    else:
+        result_descriptions.append("Apparent age increases by one year.")
+
+    # Next, determine if any aging points are gained.
+    if 10 <= aging_total <= 12:
+        result_descriptions.append("Gain 1 Aging Point in **any** Characteristic.")
+    elif aging_total == 13:
+        result_descriptions.append("Gain sufficient Aging Points (in any Characteristics) to reach the next level in Decrepitude, and **must make a Crisis roll**.")
+    elif aging_total == 14:
+        result_descriptions.append("Gain 1 Aging Point in **Quickness**.")
+    elif aging_total == 15:
+        result_descriptions.append("Gain 1 Aging Point in **Stamina**.")
+    elif aging_total == 16:
+        result_descriptions.append("Gain 1 Aging Point in **Perception**.")
+    elif aging_total == 17:
+        result_descriptions.append("Gain 1 Aging Point in **Presence**.")
+    elif aging_total == 18:
+        result_descriptions.append("Gain 1 Aging Point in **Strength** and **Stamina**.")
+    elif aging_total == 19:
+        result_descriptions.append("Gain 1 Aging Point in **Dexterity** and **Quickness**.")
+    elif aging_total == 20:
+        result_descriptions.append("Gain 1 Aging Point in **Communication** and **Presence**.")
+    elif aging_total == 21:
+        result_descriptions.append("Gain 1 Aging Point in **Intelligence** and **Perception**.")
+    elif aging_total >= 22:
+        result_descriptions.append("Gain sufficient Aging Points (in any Characteristics) to reach the next level in Decrepitude, and **must make a Crisis roll**.")
+
+    # If there were no specific aging point results, add a "no effect" line.
+    if not result_descriptions:
+         result_descriptions.append("No further effects.")
+         
+    # Join all the description parts into the final output
+    output_lines.extend(result_descriptions)
+
+    return "\n".join(output_lines)
+
 def stress(username, modifier:int, botch:int, rolltype:str, ease:int, reason:str):  
   if modifier == 0:
           response = str(username) + " rolls a stress die"
