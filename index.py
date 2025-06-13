@@ -181,7 +181,7 @@ async def roll(interaction: discord.Interaction, diceexpression: str, reason:str
 
 @bot.tree.command(name="age", description='Roll Aging.')
 @app_commands.describe(age = "The current age of a character, like 43", modifier = "The modifiers to the aging roll, like a longevity ritual or living conditions.")
-async def roll(interaction: discord.Interaction, age: int, modifier:int=0):
+async def age(interaction: discord.Interaction, age: int, modifier:int=0):
     username = str(interaction.user.display_name)
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled aging " + str(age))    
     await interaction.response.send_message(armdice.aging(username, age, modifier))

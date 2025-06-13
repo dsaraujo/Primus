@@ -188,7 +188,7 @@ def stress_die_no_botch() -> int:
     else:
         return roll
 
-def aging(username, age:int, modidifier:int) -> str:
+def aging(username, age:int, modifier:int) -> str:
     """
     Performs an Ars Magica 5th Edition aging roll and returns a formatted string.
 
