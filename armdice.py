@@ -215,7 +215,6 @@ def aging(username, age:int, modifier:int) -> str:
     output_lines = []
     output_lines.append(f"**Aging Roll for Age {age}** (Modifier: `{modifier}`)")
     output_lines.append(f"`Stress Die: {d10_result} + Age Bonus: {age_bonus} + Modifier: {modifier} =` **Total: {aging_total}**")
-    output_lines.append("---") # Creates a horizontal line in Discord
 
     # Determine the outcomes based on the Aging Rolls table (ArM5, p. 170).
     result_descriptions = []
