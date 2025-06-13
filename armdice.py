@@ -209,12 +209,12 @@ def aging(username, age:int, modifier:int) -> str:
 
     # Calculate the components of the aging roll.
     age_bonus = math.ceil(age / 10)
-    aging_total = d10_result + age_bonus - modifier
+    aging_total = d10_result + age_bonus + modifier
 
     # Start building the output string for Discord.
     output_lines = []
     output_lines.append(f"**Aging Roll for Age {age}** (Modifier: `{modifier}`)")
-    output_lines.append(f"`Stress Die: {d10_result} + Age Bonus: {age_bonus} - Modifier: {modifier} =` **Total: {aging_total}**")
+    output_lines.append(f"`Stress Die: {d10_result} + Age Bonus: {age_bonus} + Modifier: {modifier} =` **Total: {aging_total}**")
     output_lines.append("---") # Creates a horizontal line in Discord
 
     # Determine the outcomes based on the Aging Rolls table (ArM5, p. 170).
