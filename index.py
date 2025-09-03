@@ -1,5 +1,3 @@
-import json
-import sys
 import re
 
 import discord
@@ -10,12 +8,14 @@ import virtues_flaws
 import smbonus
 import baselines
 import armdice
+import vis
 
 from discord.ext import commands
 from discord import app_commands
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
 
@@ -185,6 +185,15 @@ async def age(interaction: discord.Interaction, age: int, modifier:int=0):
     username = str(interaction.user.display_name)
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled aging " + str(age))    
     await interaction.response.send_message(armdice.aging(username, age, modifier))
+
+@bot.tree.command(name="setup", description="Set up a new vis distribution.")
+@app_commands.describe(total_vis="The vis to distribute (e.g., '10 creo, 5 terram, 8 vim').", role="The role of users to distribute the marbles to.")
+async def setup(interaction: discord.Interaction, role: discord.Role, total_vis: str):
+    await vis.setup_marbles(interaction, role, total_vis)
+
+@bot.tree.command(name="distribute", description="Distributes the vis based on preferences and randomness.")
+async def distribute(interaction: discord.Interaction):
+    await vis.distribute_marbles(interaction)
 
 @bot.command(name='simple', help="!simple <modifier> [rolltype] [easefactor] [reason] - Rolls a simple die and add the modifier with an optional reason for the roll. Rolltype can be skill or spell.")
 async def simple2(ctx, modifier:int=0, rolltype:str='', ease:int=0, reason:str=''):
