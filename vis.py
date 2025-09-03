@@ -103,38 +103,66 @@ async def distribute_marbles(interaction: discord.Interaction):
     preferences = marble_game["preferences"]
     distribution = {user_id: [] for user_id in participants}
 
-    # --- 1. Prioritize Preferences ---
-    # Shuffle users with preferences to randomly decide who gets a preferred marble if supply is limited
-    preferred_users = list(preferences.keys())
-    random.shuffle(preferred_users)
-    
-    for user_id in preferred_users:
-        color = preferences[user_id]
-        if inventory.get(color, 0) > 0:
-            distribution[user_id].append(color)
-            inventory[color] -= 1
+    # --- 0. Check if enough marbles ---
+    total_marbles = sum(inventory.values())
+    if total_marbles < len(participants):
+        embed = discord.Embed(
+            title="🧙 Vis Distribution Results",
+            description="Not enough vis to distribute to all participants. Each participant receives zero.",
+            color=discord.Color.red()
+        )
+        for user_id in participants:
+            member = interaction.guild.get_member(user_id)
+            if member:
+                embed.add_field(name=member.display_name, value="None", inline=False)
+        marble_game.update({
+            "is_active": False, "inventory": {}, "participants": set(),
+            "preferences": {}, "message": None, "starter_id": None
+        })
+        await interaction.followup.send(embed=embed)
+        return
 
-    # --- 2. Randomly Distribute the Rest ---
-    # Create a flat list of all remaining marbles
-    remaining_pool = []
-    for color, count in inventory.items():
-        remaining_pool.extend([color] * count)
-    random.shuffle(remaining_pool)
-    
-    # Shuffle participants to ensure random distribution order
-    random.shuffle(participants)
-    
-    # Distribute remaining marbles one by one, cycling through users
+    # --- 1. Distribute marbles fairly, honoring preferences ---
+    marbles_left = sum(inventory.values())
     num_participants = len(participants)
-    for i, marble in enumerate(remaining_pool):
-        if i >= num_participants * (len(remaining_pool) // num_participants):
-            break # Stop when we can't give one to everyone anymore
-        recipient_id = participants[i % num_participants]
-        distribution[recipient_id].append(marble)
+    marbles_per_user = marbles_left // num_participants    
 
-    # --- 3. Calculate Remainder ---
-    total_distributed = sum(len(marbles) for marbles in distribution.values())
-    leftovers = remaining_pool[total_distributed:]
+    # Shuffle for fairness
+    random.shuffle(participants)
+
+    # Build a flat list of all marbles
+    marble_pool = []
+    for color, count in inventory.items():
+        marble_pool.extend([color] * count)
+    random.shuffle(marble_pool)
+
+    # Assign marbles per user, honoring preferences
+    distribution = {user_id: [] for user_id in participants}
+    assigned_indices = set()
+    for round_num in range(marbles_per_user):
+        for user_id in participants:
+            preferred = preferences.get(user_id)
+            # Try to assign preferred marble if available
+            found = False
+            if preferred:
+                for i, marble in enumerate(marble_pool):
+                    if i in assigned_indices:
+                        continue
+                    if marble == preferred:
+                        distribution[user_id].append(marble)
+                        assigned_indices.add(i)
+                        found = True
+                        break
+            # If not found, assign any available marble
+            if not found:
+                for i, marble in enumerate(marble_pool):
+                    if i not in assigned_indices:
+                        distribution[user_id].append(marble)
+                        assigned_indices.add(i)
+                        break
+
+    # Calculate leftovers
+    leftovers = [marble_pool[i] for i in range(len(marble_pool)) if i not in assigned_indices]
 
     # --- 4. Build and Send the Results Embed ---
     embed = discord.Embed(title="🧙 Vis Distribution Results", color=discord.Color.green())
