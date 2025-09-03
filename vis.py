@@ -15,21 +15,16 @@ marble_game = {
 }
 
 COLOR_EMOJIS = {
-    "creo": "⚪", "intellego": "🟡", "muto": "🏳️‍🌈", "perdo": "⚫", "rego": "🟣",
-    "animal": "🟤", "aquam": "🫧", "auram": "🟣", "corpus": "🔴", "herbam": "🟢",
-    "imaginem": "🔵", "ignem": "🔥", "mentem": "🟠", "terram": "🟤", "vim": "✨"
+    "creo": "✨", "intellego": "👁️", "muto": "🦋", "perdo": "🍂", "rego": "⚖️",
+    "animal": "🐾", "aquam": "💧", "auram": "💨", "corpus": "👤", "herbam": "🌿",
+    "imaginem": "🎭", "ignem": "🔥", "mentem": "🧠", "terram": "⛰️", "vim": "🌀"
 }
-
-# Creo is white, Intellego gold, Muto constantly fluctuating, Perdo black, Rego purple
-# Animal brown, Aquam blue, Auram violet, Corpus dark red, Herbam green, 
-# Imaginem pearly blue, Ignem bright red, Mentem orange, Terram dark brown, and Vim silver. 
-
 
 async def setup_marbles(interaction: discord.Interaction, role: discord.Role, vis: str):
     """Starts the marble distribution setup process."""
     if marble_game["is_active"]:
         await interaction.response.send_message(
-            "A vis distribution is already in progress! Please use `/distribute_vis` to finish it first.",
+            "A vis distribution is already in progress! Please use `/distribute` to finish it first.",
             ephemeral=True
         )
         return
@@ -72,7 +67,7 @@ async def setup_marbles(interaction: discord.Interaction, role: discord.Role, vi
     
     embed = discord.Embed(
         title="🎉 Vis Distribution Setup!",
-        description=f"Click a button below to claim your preferred vis. The distribution will be finalized with `/distribute_vis`.",
+        description=f"Click a button below to claim your preferred vis. The distribution will be finalized with `/distribute`.",
         color=discord.Color.blue()
     )
     marble_list_str = "\n".join(
@@ -88,7 +83,7 @@ async def setup_marbles(interaction: discord.Interaction, role: discord.Role, vi
 async def distribute_marbles(interaction: discord.Interaction):
     """Finalizes the distribution, allocating marbles to users."""
     if not marble_game["is_active"]:
-        await interaction.response.send_message("No vis distribution is currently active. Use `/setup_vis` to start one.", ephemeral=True)
+        await interaction.response.send_message("No vis distribution is currently active. Use `/setup` to start one.", ephemeral=True)
         return
     
     # Optional: Only allow the user who started the game to distribute
@@ -189,13 +184,14 @@ async def distribute_marbles(interaction: discord.Interaction):
     
     # --- 5. Clean Up ---
     # Disable buttons on the original message
-    #try:
-    #    if marble_game["message"]:
-    #        # Fetch the original message and disable its view            
-    #        original_message = await bot.get_channel(marble_game["message"].channel.id).fetch_message(marble_game["message"].id)
-    #        await original_message.edit(view=None)
-    #except (discord.NotFound, discord.Forbidden):
-    #    print("Could not find or edit the original setup message.")
+    try:
+        if marble_game["message"]:
+            channel = interaction.guild.get_channel(marble_game["message"].channel.id)
+            if channel:
+                original_message = await channel.fetch_message(marble_game["message"].id)
+                await original_message.edit(view=None)
+    except (discord.NotFound, discord.Forbidden, AttributeError):
+        print("Could not find or edit the original setup message.")
     
     # Reset the game state for the next run
     marble_game.update({
