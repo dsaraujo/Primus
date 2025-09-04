@@ -1,6 +1,8 @@
 import re
-from collections import Counter
+import io
 import random
+import csv
+from collections import Counter
 
 import discord
 from discord.ext import commands
@@ -181,7 +183,20 @@ async def distribute_marbles(interaction: discord.Interaction):
             f"{COLOR_EMOJIS.get(c, '🔹')} **{leftover_counts[c]}x {c.capitalize()}**" for c in sorted(leftover_counts)
         )
         embed.add_field(name="Leftover Vis", value=leftover_str, inline=False)
-    
+
+    csv_buffer = io.StringIO()
+    csv_writer = csv.writer(csv_buffer, delimiter='\t')
+    csv_writer.writerow(["Amount", "Art", "Kind", "Notes"])
+    for user_id, marbles in distribution.items():
+        member = interaction.guild.get_member(user_id)
+        if member and marbles:
+            marble_counts = Counter(marbles)
+            for color, amount in marble_counts.items():
+                csv_writer.writerow([-amount, color.capitalize(), "Magic", "Divisão do Covenant - " + member.display_name])
+
+    csv_buffer.seek(0)
+    discord_file = discord.File(fp=io.BytesIO(csv_buffer.getvalue().encode()), filename="vis_distribution.csv")
+
     # --- 5. Clean Up ---
     # Disable buttons on the original message
     try:
@@ -199,8 +214,7 @@ async def distribute_marbles(interaction: discord.Interaction):
         "preferences": {}, "message": None, "starter_id": None
     })
 
-    await interaction.followup.send(embed=embed)
-
+    await interaction.followup.send(embed=embed, file=discord_file)
     
 class PreferenceView(discord.ui.View):
     def __init__(self, colors):
@@ -257,14 +271,18 @@ class PreferenceView(discord.ui.View):
             original_message = await marble_game["message"].edit(
                 embed=None, view=self
             )  # fetch the message object if needed
-            embed = original_message.embeds[0] if original_message.embeds else discord.Embed()
+            embed = original_message.embeds[0] if original_message.embeds else discord.Embed(
+                title="🎉 Vis Distribution Setup!",
+                description=f"Click a button below to claim your preferred vis. The distribution will be finalized with `/distribute`.",
+                color=discord.Color.blue()
+            )
             # Remove any previous "Preferences" field
+
             embed.clear_fields()
             # Rebuild fields
             marble_list_str = "\n".join(
-                f"{COLOR_EMOJIS.get(c, '🔹')} **{c.capitalize()}**: {marble_game['inventory'][c]} available"
-                for c in marble_game['inventory']
-            )
+                f"{COLOR_EMOJIS.get(c, '🔹')} **{c.capitalize()}**: {v} available" for c, v in marble_game['inventory'].items()
+        )
             embed.add_field(name="Available Vis", value=marble_list_str, inline=False)
             #embed.add_field(
             #    name="Participants",
