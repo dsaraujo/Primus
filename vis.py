@@ -74,7 +74,7 @@ async def setup_marbles(interaction: discord.Interaction, role: discord.Role, vi
         f"{COLOR_EMOJIS.get(c, '🔹')} **{c.capitalize()}**: {v} available" for c, v in inventory.items()
     )
     embed.add_field(name="Available Vis", value=marble_list_str, inline=False)
-    embed.add_field(name="Participants", value=f"{len(participants)} members from the '{role.name}' role.", inline=False)
+    # embed.add_field(name="Participants", value=f"{len(participants)} members from the '{role.name}' role.", inline=False)
     
     await interaction.response.send_message(embed=embed, view=view)
     # Store the message so we can potentially disable the buttons later
@@ -240,4 +240,37 @@ class PreferenceView(discord.ui.View):
             f"Your preference has been set to {emoji} **{chosen_color.capitalize()}**!",
             ephemeral=True
         )
+
+        # --- Update the setup message with current preferences ---
+        if marble_game["message"]:
+            # Build a list of users who have picked a preference
+            guild = interaction.guild
+            picked = []
+            for user_id, color in marble_game["preferences"].items():
+                member = guild.get_member(user_id)
+                if member:
+                    color_emoji = COLOR_EMOJIS.get(color.lower(), "🔹")
+                    picked.append(f"{member.display_name}: {color_emoji} **{color.capitalize()}**")
+            picked_str = "\n".join(picked) if picked else "No preferences yet."
+
+            # Edit the embed
+            original_message = await marble_game["message"].edit(
+                embed=None, view=self
+            )  # fetch the message object if needed
+            embed = original_message.embeds[0] if original_message.embeds else discord.Embed()
+            # Remove any previous "Preferences" field
+            embed.clear_fields()
+            # Rebuild fields
+            marble_list_str = "\n".join(
+                f"{COLOR_EMOJIS.get(c, '🔹')} **{c.capitalize()}**: {marble_game['inventory'][c]} available"
+                for c in marble_game['inventory']
+            )
+            embed.add_field(name="Available Vis", value=marble_list_str, inline=False)
+            #embed.add_field(
+            #    name="Participants",
+            #    value=f"{len(marble_game['participants'])} members.",
+            #    inline=False
+            #)
+            embed.add_field(name="Preferences", value=picked_str, inline=False)
+            await marble_game["message"].edit(embed=embed, view=self)
 
