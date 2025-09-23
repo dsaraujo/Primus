@@ -877,13 +877,18 @@ def search_spell(query):
     spell_size = spell['system']['targetSize']
     spell_source = spell['system']['source']
     spell_source_page = spell['system']['page']
+    spell_ritual = spell['system']['ritual']
+    spell_requisite_mag = spell['system']['enhancingRequisite']
+    spell_technique_req = spell['system']['technique-req']
+    spell_form_req = spell['system']['form-req']
+    spell_req = getRequisites(spell_technique_req, spell_form_req)
 
     emojis = get_emoji(spell['system']['technique']['value'], spell['system']['form']['value'])
 
     technique = spell['system']['technique']['value'].capitalize()
     form = spell['system']['form']['value'].capitalize()
 
-    level = calculate_level(spell_base, spell_range, spell_duration, spell_target, spell_size, spell_complexity)
+    level = calculate_level(spell_base, spell_range, spell_duration, spell_target, spell_size, spell_complexity, spell_requisite_mag)
 
     spell_level = emojis + " " + technique + form + " " + str(level)
 
@@ -899,16 +904,39 @@ def search_spell(query):
     msg = msg + "**R**: " + ranges[spell_range]
     msg = msg + " **D**: " + durations[spell_duration]
     msg = msg + " **T**: " + targets[spell_target] + "\n"
+    if spell_req != '': msg = msg + "**Req**: " + spell_req + "\n"
     msg = msg + description + "\n(Base " + str(spell_base)
     msg = msg + ", +" + str(spell_ranges[spell_range]['impact']) + " " + ranges[spell_range] 
     msg = msg + ", +" + str(spell_durations[spell_duration]['impact']) + " " + durations[spell_duration]
     msg = msg + ", +" + str(spell_targets[spell_target]['impact']) + " " + targets[spell_target]
     if spell_size > 0: msg = msg + ", +" + str(spell_size) + " Size"
     if spell_complexity > 0: msg = msg + ", +" + str(spell_complexity) + " Complexity"
+    if spell_requisite_mag > 0: msg = msg + ", +" + str(spell_requisite_mag) + " Requisite"
+    if spell_ritual: msg = msg + ",*Ritual*"
     msg = msg + ")"
     msg = msg + " *Src: " + spell_source + " p." + str(spell_source_page) + "*"
 
     return msg
+
+def getRequisites(spell_technique_req, spell_form_req):
+  ret = ''
+  if spell_technique_req['cr']: ret = ret + 'Creo '
+  if spell_technique_req['pe']: ret = ret + 'Perdo '
+  if spell_technique_req['mu']: ret = ret + 'Muto '
+  if spell_technique_req['in']: ret = ret + 'Intellego '
+  if spell_technique_req['re']: ret = ret + 'Rego '
+  if spell_form_req['au']: ret = ret + 'Auram '
+  if spell_form_req['an']: ret = ret + 'Animal '
+  if spell_form_req['aq']: ret = ret + 'Aquam '
+  if spell_form_req['co']: ret = ret + 'Corpus '
+  if spell_form_req['he']: ret = ret + 'Herbam '
+  if spell_form_req['ig']: ret = ret + 'Ignem '  
+  if spell_form_req['im']: ret = ret + 'Imaginem '
+  if spell_form_req['me']: ret = ret + 'Mentem '
+  if spell_form_req['te']: ret = ret + 'Terram '
+  if spell_form_req['vi']: ret = ret + 'Vim '
+  return ret.strip()
+   
 
 def add_spell_magnitude(base, num):
     # Convert to an integer if it's a string
@@ -943,11 +971,11 @@ def add_spell_magnitude(base, num):
                 num += 1
             return res
 
-def calculate_level(b, r, d, t, s, c):
+def calculate_level(b, r, d, t, s, c, req):
     r = int(getValue(spell_ranges, r))
     d = int(getValue(spell_durations, d))
     t = int(getValue(spell_targets, t))
-    return add_spell_magnitude(b, r + d + t + s + c)
+    return add_spell_magnitude(b, r + d + t + s + c + req)
 
 def get_spell_base_size(form):
     form = form.lower()
