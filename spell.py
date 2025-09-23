@@ -903,7 +903,9 @@ def search_spell(query):
     msg = msg + "**" + name + "** (" + spell_level +")\n"
     msg = msg + "**R**: " + ranges[spell_range]
     msg = msg + " **D**: " + durations[spell_duration]
-    msg = msg + " **T**: " + targets[spell_target] + "\n"
+    msg = msg + " **T**: " + targets[spell_target] 
+    if spell_ritual: msg = msg + ", Ritual"
+    msg = msg + "\n"
     if spell_req != '': msg = msg + "**Req**: " + spell_req + "\n"
     msg = msg + description + "\n(Base " + str(spell_base)
     msg = msg + ", +" + str(spell_ranges[spell_range]['impact']) + " " + ranges[spell_range] 
@@ -912,7 +914,6 @@ def search_spell(query):
     if spell_size > 0: msg = msg + ", +" + str(spell_size) + " Size"
     if spell_complexity > 0: msg = msg + ", +" + str(spell_complexity) + " Complexity"
     if spell_requisite_mag > 0: msg = msg + ", +" + str(spell_requisite_mag) + " Requisite"
-    if spell_ritual: msg = msg + ",*Ritual*"
     msg = msg + ")"
     msg = msg + " *Src: " + spell_source + " p." + str(spell_source_page) + "*"
 
