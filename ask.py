@@ -20,9 +20,9 @@ sample_file = client.files.upload(
 async def ask_primus(prompt:str): 
   
   full_prompt = (
-    "Answer the question below based on the Sessions.pdf file. "
-    "Use the same language of the question to answer. "
-    "You MUST keep the response under 1700 characters.\n" + prompt
+    "Using the same language of the question to answer, "
+    "and keeping the whole response under 1700 characters,"
+    "answer the question below based on the Sessions.pdf file.\n" + prompt
   )
   try:
     response = await asyncio.to_thread(
