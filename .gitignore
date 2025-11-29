@@ -1,4 +1,5 @@
-__pycache__/desktop.ini
+__pycache__/
+.venv/
 desktop.ini
 *.pyc
 my_token.py

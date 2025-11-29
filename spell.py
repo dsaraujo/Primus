@@ -857,9 +857,11 @@ def search_spell(query):
     for i in data:
         names.append(i['name'])
 
-    result, score = process.extractOne(query, names, scorer=fuzz.token_set_ratio)
+    ext = process.extractOne(query, names, scorer=fuzz.token_set_ratio)
+    if not ext:
+        return ''    
 
-    spell = next((i for i in data if i['name'] == result), None)
+    spell = next((i for i in data if i['name'] == ext[0]), None)
     if spell is None:
         return ''
 

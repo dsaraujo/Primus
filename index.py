@@ -9,6 +9,7 @@ import smbonus
 import baselines
 import armdice
 import vis
+import ask
 
 from discord.ext import commands
 from discord import app_commands
@@ -92,7 +93,7 @@ async def spellquery2(ctx, *, query:str=''):
     for s in break_string(spell.search_spell(query)):
         await ctx.send(s)        
     username = str(ctx.author.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searche the spell " + query)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searched the spell " + query)
 
 @bot.tree.command(name='spell', description='Search for a spell.')
 @app_commands.describe(query = "The partial or complete name of the spell")
@@ -103,7 +104,7 @@ async def spellquery(interaction: discord.Interaction, query:str=''):
         else:
             await interaction.followup.send(s)
     username = str(interaction.user.display_name)
-    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searche the spell " + query)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " searched the spell " + query)
 
 @bot.tree.command(name='virtue', description='Search for a virtue.')
 @app_commands.describe(query = "The partial or complete name of the virtue")
@@ -218,6 +219,15 @@ async def roll2(ctx, diceexpression: str, reason:str=''):
     username = str(ctx.author.display_name)
     print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " rolled a dice expression: " + diceexpression + " for " + reason)    
     await ctx.send(armdice.roll(username, diceexpression, reason))
+
+@bot.tree.command(name='ask', description='Ask Primus a question about the campaign.')
+@app_commands.describe(query = "The prompt to ask Primus")
+async def ask_bot2(interaction: discord.Interaction, query:str=''):    
+    username = str(interaction.user.display_name)
+    print(time.strftime("%m/%d/%y %H:%M:%S") + " " + username + " asked " + query)
+    await interaction.response.defer()
+    answer = await ask.ask_primus(query)
+    await interaction.edit_original_response(content=answer)    
 
 @bot.event
 async def on_command_error(ctx, error):
