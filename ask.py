@@ -27,7 +27,7 @@ async def ask_primus(prompt:str):
   try:
     response = await asyncio.to_thread(
       client.models.generate_content,
-      model="gemini-2.5-pro",
+      model="gemini-2.5-flash",
       contents=[sample_file, prompt]
     )
 
