@@ -5,7 +5,6 @@ import csv
 from collections import Counter
 
 import discord
-from discord.ext import commands
 
 marble_game = {
   "is_active": False,
@@ -109,7 +108,7 @@ async def distribute_marbles(interaction: discord.Interaction):
             color=discord.Color.red()
         )
         for user_id in participants:
-            member = interaction.guild.get_member(user_id)
+            member = interaction.guild.get_member(user_id) # type: ignore
             if member:
                 embed.add_field(name=member.display_name, value="None", inline=False)
         marble_game.update({
@@ -168,7 +167,7 @@ async def distribute_marbles(interaction: discord.Interaction):
          embed.description = "No marbles were distributed."
     else:
         for user_id, marbles in distribution.items():
-            member = interaction.guild.get_member(user_id)
+            member = interaction.guild.get_member(user_id) # type: ignore
             if member:
                 # Use Counter for a clean summary (e.g., 2x Red, 1x Blue)
                 marble_counts = Counter(marbles)
@@ -188,7 +187,7 @@ async def distribute_marbles(interaction: discord.Interaction):
     csv_writer = csv.writer(csv_buffer, delimiter='\t')
     csv_writer.writerow(["Amount", "Art", "Kind", "Notes"])
     for user_id, marbles in distribution.items():
-        member = interaction.guild.get_member(user_id)
+        member = interaction.guild.get_member(user_id) # type: ignore
         if member and marbles:
             marble_counts = Counter(marbles)
             for color, amount in marble_counts.items():
@@ -201,9 +200,9 @@ async def distribute_marbles(interaction: discord.Interaction):
     # Disable buttons on the original message
     try:
         if marble_game["message"]:
-            channel = interaction.guild.get_channel(marble_game["message"].channel.id)
+            channel = interaction.guild.get_channel(marble_game["message"].channel.id) # type: ignore
             if channel:
-                original_message = await channel.fetch_message(marble_game["message"].id)
+                original_message = await channel.fetch_message(marble_game["message"].id) # type: ignore
                 await original_message.edit(view=None)
     except (discord.NotFound, discord.Forbidden, AttributeError):
         print("Could not find or edit the original setup message.")
@@ -244,7 +243,7 @@ class PreferenceView(discord.ui.View):
             return
 
         # Get the color from the button's custom_id
-        chosen_color = interaction.data["custom_id"]
+        chosen_color = interaction.data["custom_id"] # type: ignore
         
         # Store the user's preference
         marble_game["preferences"][interaction.user.id] = chosen_color
@@ -261,7 +260,7 @@ class PreferenceView(discord.ui.View):
             guild = interaction.guild
             picked = []
             for user_id, color in marble_game["preferences"].items():
-                member = guild.get_member(user_id)
+                member = guild.get_member(user_id) # type: ignore
                 if member:
                     color_emoji = COLOR_EMOJIS.get(color.lower(), "🔹")
                     picked.append(f"{member.display_name}: {color_emoji} **{color.capitalize()}**")
